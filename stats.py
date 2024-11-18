@@ -1,8 +1,21 @@
-import os
 import sys
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Iterator
 from pathlib import Path
+
+# Language file extensions mapping
+LANGUAGES = {
+    "Go": "go",
+    "Rust": "rs",
+    "Haskell": "hs",
+    "Lua": "lua",
+    "Julia": "jl",
+    "TypeScript": "ts",
+    "JavaScript": "js",
+}
+
+# Directories to skip during analysis
+IGNORED_DIRS = {"node_modules", "dist", "build", "__pycache__", ".git"}
 
 @dataclass(frozen=True)
 class LanguageStats:
@@ -25,20 +38,6 @@ class AnalysisResults:
     stats: Dict[str, LanguageStats]
     total_files: int
     total_lines: int
-
-# Language file extensions mapping
-LANGUAGES = {
-    "Go": "go",
-    "Rust": "rs",
-    "Haskell": "hs",
-    "Lua": "lua",
-    "Julia": "jl",
-    "TypeScript": "ts",
-    "JavaScript": "js",
-}
-
-# Directories to skip during analysis
-IGNORED_DIRS = {"node_modules", "dist", "build", "__pycache__", ".git"}
 
 # Analyze a single file and return its stats
 def analyze_file(file_path: Path) -> FileAnalysis | None:
