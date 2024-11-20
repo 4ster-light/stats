@@ -4,7 +4,8 @@ from typing import Dict, List, Tuple, Iterator
 from pathlib import Path
 
 # Language file extensions mapping
-LANGUAGES = {
+LANGUAGES: dict[str, str] = {
+    "Python": "py",
     "Go": "go",
     "Rust": "rs",
     "Haskell": "hs",
@@ -12,10 +13,11 @@ LANGUAGES = {
     "Julia": "jl",
     "TypeScript": "ts",
     "JavaScript": "js",
+    "Nix": "nix",
 }
 
 # Directories to skip during analysis
-IGNORED_DIRS = {"node_modules", "dist", "build", "__pycache__", ".git"}
+IGNORED_DIRS: set[str] = {"node_modules", "dist", "build", "__pycache__", ".git"}
 
 @dataclass(frozen=True)
 class LanguageStats:
