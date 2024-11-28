@@ -7,7 +7,7 @@ An small tool I made to know how much I code in each language I use
 The directory must be given as only argument or else it'll default to the current directory
 
 ```bash
-python stats.py
+python stats.py <directory>
 ```
 
 ## Output
@@ -26,6 +26,14 @@ python stats.py
 ├───────────────┼──────────┼──────────┼──────────┼──────────┤
 │Total          │        47│      2336│    100.0%│    100.0%│
 └───────────────┴──────────┴──────────┴──────────┴──────────┘
+```
+
+## Bonus
+
+I also made an ocaml implementation since I was bored and to practice the language, it works the exact same and can be run like so:
+
+```bash
+ocaml stats.ml <directory>
 ```
 
 ## License
