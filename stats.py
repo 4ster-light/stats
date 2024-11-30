@@ -11,10 +11,10 @@ LANGUAGES: dict[str, str] = {
     "Rust": "rs",
     "Haskell": "hs",
     "Lua": "lua",
-    "Julia": "jl",
     "TypeScript": "ts",
     "JavaScript": "js",
     "Nix": "nix",
+    "OCaml": "ml",
 }
 
 # Directories to skip during analysis
