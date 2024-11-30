@@ -8,8 +8,8 @@ let languages = [
   ("Templ", "templ");
   ("Rust", "rs");
   ("Haskell", "hs");
+  ("OCaml", "ml");
   ("Lua", "lua");
-  ("Julia", "jl");
   ("TypeScript", "ts");
   ("JavaScript", "js");
   ("Nix", "nix");
@@ -20,17 +20,21 @@ let ignored_dirs = ["node_modules"; "dist"; "build"; "__pycache__"; ".git"]
 
 (* Language stats type *)
 type language_stats = {
-  mutable files : int;
-  mutable lines : int;
+  mutable files: int;
+  mutable lines: int;
 }
 
 (* Analyze a single file for its language and line count *)
 let analyze_file file_path =
   try
+    (* Extract the file extension *)
     let ext = Filename.extension file_path in
     let ext = if String.length ext > 1 then String.sub ext 1 (String.length ext - 1) else "" in
+    
+    (* Find the corresponding language *)
     match List.find_opt (fun (_, lang_ext) -> lang_ext = ext) languages with
     | Some (language, _) ->
+      (* Count lines in the file *)
       let ic = open_in file_path in
       let rec count_lines acc =
         match input_line ic with
@@ -45,7 +49,7 @@ let analyze_file file_path =
     eprintf "Warning: Could not process %s\n" file_path;
     None
 
-(* Check if a path should be skipped *)
+(* Check if a path should be ignored *)
 let is_ignored path =
   List.exists (fun dir -> Filename.basename path = dir) ignored_dirs
 
@@ -61,7 +65,7 @@ let rec get_files dir =
       acc
   ) [] (Sys.readdir dir)
 
-(* Aggregate results into statistics *)
+(* Aggregate file analysis results into statistics *)
 let aggregate_results file_analyses =
   let stats = Hashtbl.create (List.length languages) in
   let total_files = ref 0 in
@@ -83,10 +87,11 @@ let aggregate_results file_analyses =
 
 (* Print a table border *)
 let print_border (left, mid, right) =
-  printf "%s%s%s%s%s\n"
-    left (String.make 15 '-') mid
-    (String.concat mid (List.init 4 (fun _ -> String.make 10 '-')))
-    right
+  let left_segment = left ^ String.concat "" (List.init 15 (fun _ -> "─")) in
+  let mid_segments = List.init 4 (fun _ -> mid ^ String.concat "" (List.init 10 (fun _ -> "─"))) in
+
+  let border = String.concat "" (left_segment :: mid_segments @ [right]) in
+  Printf.printf "%s\n" border
 
 (* Display the results in a formatted table *)
 let display_results stats total_files total_lines =

@@ -11,7 +11,7 @@ LANGUAGES: dict[str, str] = {
     "Rust": "rs",
     "Haskell": "hs",
     "Lua": "lua",
-    "Julia": "jl",
+    "OCaml": "ml",
     "TypeScript": "ts",
     "JavaScript": "js",
     "Nix": "nix",
