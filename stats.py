@@ -2,6 +2,9 @@ import sys
 from dataclasses import dataclass
 from typing import Iterator, Optional
 from pathlib import Path
+import argparse
+from rich.console import Console
+from rich.table import Table
 
 # Language file extensions mapping
 LANGUAGES: dict[str, str] = {
@@ -18,7 +21,8 @@ LANGUAGES: dict[str, str] = {
 }
 
 # Directories to skip during analysis
-IGNORED_DIRS: set[str] = {"node_modules", "dist", "build", "__pycache__", ".git"}
+IGNORED_DIRS: set[str] = {"node_modules", "dist", "build", "__pycache__", ".git", "venv", "env", "target"}
+console = Console()
 
 
 @dataclass(frozen=True)
@@ -26,7 +30,6 @@ class LanguageStats:
     files: int
     lines: int
 
-    # Calculate percentage of files and lines for this language
     def calculate_percentages(self, total_files: int, total_lines: int) -> tuple[float, float]:
         file_pct = (self.files / total_files * 100) if total_files > 0 else 0
         line_pct = (self.lines / total_lines * 100) if total_lines > 0 else 0
@@ -38,7 +41,6 @@ class FileAnalysis:
     language: str
     line_count: int
 
-    # Analyze a single file and return its language and line count
     @staticmethod
     def analyze(file_path: Path) -> Optional['FileAnalysis']:
         for language, ext in LANGUAGES.items():
@@ -47,7 +49,7 @@ class FileAnalysis:
                     line_count = len(file_path.read_text(encoding='utf-8').splitlines())
                     return FileAnalysis(language, line_count)
                 except (UnicodeDecodeError, FileNotFoundError) as e:
-                    print(f"\033[93mWarning: Could not process {file_path}: {str(e)}\033[0m")
+                    console.print(f"[yellow]Warning: Could not process {file_path}: {str(e)}[/yellow]")
         return None
 
 
@@ -57,7 +59,6 @@ class AnalysisResults:
     total_files: int
     total_lines: int
 
-    # Combine individual file analyses into final results
     @staticmethod
     def aggregate(file_analyses: list[FileAnalysis]) -> 'AnalysisResults':
         language_stats = {}
@@ -76,57 +77,66 @@ class AnalysisResults:
         return AnalysisResults(language_stats, total_files, total_lines)
 
 
-# Yield files from a directory tree, skipping ignored directories
 def get_files(directory: Path) -> Iterator[Path]:
     for path in directory.rglob('*'):
         if path.is_file() and not any(ignore in path.parts for ignore in IGNORED_DIRS):
             yield path
 
 
-# Print table border with given style characters
-def print_border(style: tuple[str, str, str]) -> None:
-    left, mid, right = style
-    segments = [left + "─" * 15] + [mid + "─" * 10 for _ in range(4)]
-    print(''.join(segments) + right)
-
-
-# Print analysis results in a formatted table
 def display_results(results: AnalysisResults) -> None:
-    # Header row
-    print_border(("┌", "┬", "┐"))
-    print(f"│{'Language':<15}│{'Files':>10}│{'Lines':>10}│{'File %':>10}│{'Line %':>10}│")
-    print_border(("├", "┼", "┤"))
+    table = Table(title="Language Statistics", style="cyan")
 
-    # Individual language rows
+    table.add_column("Language", justify="left", style="bold yellow", no_wrap=True)
+    table.add_column("Files", justify="right")
+    table.add_column("Lines", justify="right")
+    table.add_column("File %", justify="right")
+    table.add_column("Line %", justify="right")
+
+    # Populate table with language stats
     for language in sorted(results.stats.keys()):
         stats = results.stats[language]
         file_pct, line_pct = stats.calculate_percentages(results.total_files, results.total_lines)
 
-        print(
-            f"│{language:<15}"
-            f"│{stats.files:>10}"
-            f"│{stats.lines:>10}"
-            f"│{file_pct:>9.1f}%"
-            f"│{line_pct:>9.1f}%│"
+        table.add_row(
+            language,
+            str(stats.files),
+            str(stats.lines),
+            f"{file_pct:.1f}%",
+            f"{line_pct:.1f}%"
         )
 
     # Total row
-    print_border(("├", "┼", "┤"))
-    print(
-        f"│{'Total':<15}"
-        f"│{results.total_files:>10}"
-        f"│{results.total_lines:>10}"
-        f"│{100:>9.1f}%"
-        f"│{100:>9.1f}%│"
+    table.add_row(
+        "Total",
+        str(results.total_files),
+        str(results.total_lines),
+        "100.0%",
+        "100.0%",
+        style="bold green"
     )
-    print_border(("└", "┴", "┘"))
+
+    console.print(table)
+
+
+def parse_arguments() -> Path:
+    parser = argparse.ArgumentParser(
+        description="Analyze file counts and line counts for different programming languages in a directory."
+    )
+    parser.add_argument(
+        "directory",
+        nargs="?",
+        default=".",
+        help="Directory to analyze. Defaults to current directory."
+    )
+    args = parser.parse_args()
+    return Path(args.directory)
 
 
 def main() -> None:
-    directory = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
+    directory = parse_arguments()
 
     if not directory.is_dir():
-        print(f"\033[91mError: '{directory}' is not a valid directory.\033[0m")
+        console.print(f"[red]Error: '{directory}' is not a valid directory.[/red]")
         sys.exit(1)
 
     file_analyses = [
