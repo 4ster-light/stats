@@ -6,6 +6,14 @@ An small tool I made to know how much I code in each language I use
 
 The directory must be given as only argument or else it'll default to the current directory
 
+- Activate the virtual environment first
+
+```bash
+source venv/bin/activate
+```
+
+- Run the script
+
 ```bash
 python stats.py <directory>
 ```
@@ -13,27 +21,22 @@ python stats.py <directory>
 ## Output
 
 ```bash
-┌───────────────┬──────────┬──────────┬──────────┬──────────┐
-│Language       │     Files│     Lines│    File %│    Line %│
-├───────────────┼──────────┼──────────┼──────────┼──────────┤
-│Go             │         6│       546│     12.8%│     23.4%│
-│Haskell        │        11│       377│     23.4%│     16.1%│
-│JavaScript     │         4│        90│      8.5%│      3.9%│
-│Julia          │         0│         0│      0.0%│      0.0%│
-│Lua            │         4│       199│      8.5%│      8.5%│
-│Rust           │        15│       869│     31.9%│     37.2%│
-│TypeScript     │         7│       255│     14.9%│     10.9%│
-├───────────────┼──────────┼──────────┼──────────┼──────────┤
-│Total          │        47│      2336│    100.0%│    100.0%│
-└───────────────┴──────────┴──────────┴──────────┴──────────┘
-```
-
-## Bonus
-
-I also made an ocaml implementation since I was bored and to practice the language, it works the exact same and can be run like so:
-
-```bash
-ocaml stats.ml <directory>
+              Language Statistics               
+┏━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━┳━━━━━━━━┓
+┃ Language   ┃ Files ┃ Lines ┃ File % ┃ Line % ┃
+┡━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━╇━━━━━━━━┩
+│ Go         │    15 │   998 │  20.3% │  32.0% │
+│ Haskell    │     5 │   160 │   6.8% │   5.1% │
+│ JavaScript │     3 │    75 │   4.1% │   2.4% │
+│ Lua        │    30 │   665 │  40.5% │  21.3% │
+│ Nix        │     2 │    81 │   2.7% │   2.6% │
+│ OCaml      │     0 │     0 │   0.0% │   0.0% │
+│ Python     │     2 │   247 │   2.7% │   7.9% │
+│ Rust       │     9 │   552 │  12.2% │  17.7% │
+│ Templ      │     6 │   182 │   8.1% │   5.8% │
+│ TypeScript │     2 │   158 │   2.7% │   5.1% │
+│ Total      │    74 │  3118 │ 100.0% │ 100.0% │
+└────────────┴───────┴───────┴────────┴────────┘
 ```
 
 ## License

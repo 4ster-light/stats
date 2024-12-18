@@ -10,20 +10,19 @@ from rich.table import Table
 LANGUAGES: dict[str, str] = {
     "Python": "py",
     "Go": "go",
-    "Templ": "templ",
     "Rust": "rs",
     "Haskell": "hs",
     "Lua": "lua",
-    "OCaml": "ml",
     "TypeScript": "ts",
     "JavaScript": "js",
     "Nix": "nix",
+    "Elixir": "exs",
 }
 
 # Directories to skip during analysis
 IGNORED_DIRS: set[str] = {"node_modules", "dist", "build", "__pycache__", ".git", "venv", "env", "target"}
-console = Console()
 
+console = Console()
 
 @dataclass(frozen=True)
 class LanguageStats:
@@ -84,6 +83,7 @@ def get_files(directory: Path) -> Iterator[Path]:
 
 
 def display_results(results: AnalysisResults) -> None:
+    print("\n")
     table = Table(title="Language Statistics", style="cyan")
 
     table.add_column("Language", justify="left", style="bold yellow", no_wrap=True)
@@ -92,7 +92,6 @@ def display_results(results: AnalysisResults) -> None:
     table.add_column("File %", justify="right")
     table.add_column("Line %", justify="right")
 
-    # Populate table with language stats
     for language in sorted(results.stats.keys()):
         stats = results.stats[language]
         file_pct, line_pct = stats.calculate_percentages(results.total_files, results.total_lines)
@@ -105,7 +104,6 @@ def display_results(results: AnalysisResults) -> None:
             f"{line_pct:.1f}%"
         )
 
-    # Total row
     table.add_row(
         "Total",
         str(results.total_files),
@@ -116,6 +114,7 @@ def display_results(results: AnalysisResults) -> None:
     )
 
     console.print(table)
+    print("\n")
 
 
 def parse_arguments() -> Path:
