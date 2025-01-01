@@ -9,7 +9,6 @@ from rich.table import Table
 # Language file extensions mapping
 LANGUAGES: dict[str, str] = {
     "Python": "py",
-    "Go": "go",
     "Rust": "rs",
     "Haskell": "hs",
     "Lua": "lua",
@@ -17,10 +16,11 @@ LANGUAGES: dict[str, str] = {
     "JavaScript": "js",
     "Nix": "nix",
     "Elixir": "exs",
+    "C": "c",
 }
 
 # Directories to skip during analysis
-IGNORED_DIRS: set[str] = {"node_modules", "dist", "build", "__pycache__", ".git", "venv", "env", "target"}
+IGNORED_DIRS: set[str] = {"node_modules", "dist", "build", "__pycache__", ".git", "venv", "env", ".venv", "target"}
 
 console = Console()
 
