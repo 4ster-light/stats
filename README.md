@@ -6,15 +6,11 @@ An small tool I made to know how much I code in each language I use
 
 The directory must be given as only argument or else it'll default to the current directory
 
-- Activate the virtual environment and install the dependencies first
+- Activate the virtual environment and install the dependencies first if using pip
 
 ```bash
-# Using pip
 source venv/bin/activate
 pip install -r requirements.txt
-# Using uv
-source venv/bin/activate
-uv sync
 ```
 
 - Run the script

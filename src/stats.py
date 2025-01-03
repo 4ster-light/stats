@@ -6,7 +6,8 @@ import argparse
 from rich.console import Console
 from rich.table import Table
 
-# Language file extensions mapping
+from data import AnalysisResults, FileAnalysis, LanguageStats
+
 LANGUAGES: dict[str, str] = {
     "Python": "py",
     "Rust": "rs",
@@ -19,29 +20,27 @@ LANGUAGES: dict[str, str] = {
     "C": "c",
 }
 
-# Directories to skip during analysis
 IGNORED_DIRS: set[str] = {"node_modules", "dist", "build", "__pycache__", ".git", "venv", "env", ".venv", "target"}
 
 console = Console()
 
-@dataclass(frozen=True)
-class LanguageStats:
-    files: int
-    lines: int
+def aggregate_results(file_analyses: list[FileAnalysis]) -> AnalysisResults:
+    language_stats = {}
+    total_files = 0
+    total_lines = 0
 
-    def calculate_percentages(self, total_files: int, total_lines: int) -> tuple[float, float]:
-        file_pct = (self.files / total_files * 100) if total_files > 0 else 0
-        line_pct = (self.lines / total_lines * 100) if total_lines > 0 else 0
-        return file_pct, line_pct
+    for language in LANGUAGES:
+        analyses = [a for a in file_analyses if a.language == language]
+        files = len(analyses)
+        lines = sum(a.line_count for a in analyses)
 
+        language_stats[language] = LanguageStats(files, lines)
+        total_files += files
+        total_lines += lines
 
-@dataclass(frozen=True)
-class FileAnalysis:
-    language: str
-    line_count: int
+    return AnalysisResults(language_stats, total_files, total_lines)
 
-    @staticmethod
-    def analyze(file_path: Path) -> Optional['FileAnalysis']:
+def analyze_file(file_path: Path) -> Optional[FileAnalysis]:
         for language, ext in LANGUAGES.items():
             if file_path.suffix == f".{ext}":
                 try:
@@ -50,30 +49,6 @@ class FileAnalysis:
                 except (UnicodeDecodeError, FileNotFoundError) as e:
                     console.print(f"[yellow]Warning: Could not process {file_path}: {str(e)}[/yellow]")
         return None
-
-
-@dataclass(frozen=True)
-class AnalysisResults:
-    stats: dict[str, LanguageStats]
-    total_files: int
-    total_lines: int
-
-    @staticmethod
-    def aggregate(file_analyses: list[FileAnalysis]) -> 'AnalysisResults':
-        language_stats = {}
-        total_files = 0
-        total_lines = 0
-
-        for language in LANGUAGES:
-            analyses = [a for a in file_analyses if a.language == language]
-            files = len(analyses)
-            lines = sum(a.line_count for a in analyses)
-
-            language_stats[language] = LanguageStats(files, lines)
-            total_files += files
-            total_lines += lines
-
-        return AnalysisResults(language_stats, total_files, total_lines)
 
 
 def get_files(directory: Path) -> Iterator[Path]:
@@ -140,11 +115,11 @@ def main() -> None:
 
     file_analyses = [
         analysis for analysis in (
-            FileAnalysis.analyze(file) for file in get_files(directory)
+            analyze_file(file) for file in get_files(directory)
         ) if analysis is not None
     ]
 
-    results = AnalysisResults.aggregate(file_analyses)
+    results = aggregate_results(file_analyses)
     display_results(results)
 
 
