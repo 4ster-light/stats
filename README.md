@@ -17,9 +17,9 @@ pip install -r requirements.txt
 
 ```bash
 # Directly with the python interpreter
-python stats.py <directory>
+python src/main.py <directory>
 # Using uv
-uv run stats.py <directory>
+uv run src/main.py <directory>
 ```
 
 ## Output
