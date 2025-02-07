@@ -4,42 +4,77 @@ An small tool I made to know how much I code in each language I use
 
 ## Usage
 
-The directory must be given as only argument or else it'll default to the current directory
+### Install
 
-- Activate the virtual environment and install the dependencies first if using pip
+>[!IMPORTANT]
+> First, you need to install the dependencies
 
 ```bash
-source venv/bin/activate
-pip install -r requirements.txt
+swift package resolve
 ```
 
-- Run the script
+Package.swift:
+
+```swift
+// swift-tools-version: 6.0
+
+import PackageDescription
+
+let package = Package(
+    name: "stats",
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.0"),
+        .package(url: "https://github.com/onevcat/Rainbow", from: "4.0.0"),
+    ],
+    targets: [
+        .executableTarget(
+            name: "stats",
+            dependencies: [
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Rainbow", package: "Rainbow"),
+            ]),
+        .testTarget(
+            name: "statsTests",
+            dependencies: ["stats"]),
+    ]
+)
+```
+
+### Running
+
+The directory must be given as only argument or else it'll default to the current directory.
+If you just want to run it directly:
 
 ```bash
-# Directly with the python interpreter
-python src/main.py <directory>
-# Using uv
-uv run src/main.py <directory>
+swift run stats <directory>
+```
+If you want a production build:
+
+```bash
+swift build -c release
+.build/release/stats <directory>
+```
+
+In order to run the tests:
+
+```bash
+swift test
 ```
 
 ## Output
 
 ```bash
-              Language Statistics               
+Language Statistics
 ┏━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━┳━━━━━━━━┓
 ┃ Language   ┃ Files ┃ Lines ┃ File % ┃ Line % ┃
 ┡━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━╇━━━━━━━━┩
-│ Go         │    15 │   998 │  20.3% │  32.0% │
-│ Haskell    │     5 │   160 │   6.8% │   5.1% │
-│ JavaScript │     3 │    75 │   4.1% │   2.4% │
-│ Lua        │    30 │   665 │  40.5% │  21.3% │
-│ Nix        │     2 │    81 │   2.7% │   2.6% │
-│ OCaml      │     0 │     0 │   0.0% │   0.0% │
-│ Python     │     2 │   247 │   2.7% │   7.9% │
-│ Rust       │     9 │   552 │  12.2% │  17.7% │
-│ Templ      │     6 │   182 │   8.1% │   5.8% │
-│ TypeScript │     2 │   158 │   2.7% │   5.1% │
-│ Total      │    74 │  3118 │ 100.0% │ 100.0% │
+│ Haskell    │ 5     │ 165   │ 10.9%  │ 9.1%   │
+│ JavaScript │ 3     │ 107   │ 6.5%   │ 5.9%   │
+│ Lua        │ 4     │ 203   │ 8.7%   │ 11.2%  │
+│ Python     │ 3     │ 113   │ 6.5%   │ 6.2%   │
+│ Rust       │ 15    │ 625   │ 32.6%  │ 34.5%  │
+│ Swift      │ 6     │ 266   │ 13.0%  │ 14.7%  │
+│ TypeScript │ 10    │ 330   │ 21.7%  │ 18.2%  │
 └────────────┴───────┴───────┴────────┴────────┘
 ```
 

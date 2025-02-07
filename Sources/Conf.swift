@@ -1,16 +1,14 @@
-LANGUAGES: dict[str, str] = {
+let LANGUAGES: [String: String] = [
     "Python": "py",
     "Rust": "rs",
     "Haskell": "hs",
     "Lua": "lua",
     "TypeScript": "ts",
     "JavaScript": "js",
-    "Nix": "nix",
-    "Elixir": "exs",
     "Swift": "swift",
-}
+]
 
-IGNORED_DIRS: set[str] = {
+let IGNORED_DIRS: Set<String> = [
     "node_modules",
     "dist",
     "build",
@@ -19,5 +17,5 @@ IGNORED_DIRS: set[str] = {
     "venv",
     "env",
     ".venv",
-    "target"
-}
+    "target",
+]
