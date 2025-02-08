@@ -48,16 +48,25 @@ final class StatsTests: XCTestCase {
         try "print('Hello')".write(to: tempFile1, atomically: true, encoding: .utf8)
         try "fn main() {}".write(to: tempFile2, atomically: true, encoding: .utf8)
 
-        let files = try getFiles(directory: tempDir)
-        XCTAssertEqual(files.count, 2)
+        let result = getFiles(directory: tempDir)
+        switch result {
+        case .success(let files):
+            XCTAssertEqual(files.count, 2)
+        case .failure:
+            XCTFail("Expected success but got failure")
+        }
 
         try FileManager.default.removeItem(at: tempDir)
     }
 
     func testErrorHandling() {
         let invalidDir = URL(fileURLWithPath: "/invalid/path")
-        XCTAssertThrowsError(try getFiles(directory: invalidDir)) { error in
-            XCTAssertTrue(error is StatsError)
+        let result = getFiles(directory: invalidDir)
+        switch result {
+        case .success:
+            XCTFail("Expected failure but got success")
+        case .failure(let error):
+            XCTFail("Expected directoryNotFound error but got \(error)")
         }
     }
 }

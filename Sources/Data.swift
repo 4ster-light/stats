@@ -23,3 +23,23 @@ struct AnalysisResults {
     let totalFiles: Int
     let totalLines: Int
 }
+
+enum StatsError: Error, CustomStringConvertible {
+    case directoryNotFound(String)
+    case directoryNotReadable(String)
+    case directoryEnumerationFailed(String)
+    case fileReadFailed(String)
+
+    var description: String {
+        switch self {
+        case .directoryNotFound(let path):
+            return "Directory not found: \(path)"
+        case .directoryNotReadable(let path):
+            return "Directory not readable: \(path)"
+        case .directoryEnumerationFailed(let path):
+            return "Failed to enumerate files in directory: \(path)"
+        case .fileReadFailed(let path):
+            return "Failed to read file: \(path)"
+        }
+    }
+}

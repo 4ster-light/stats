@@ -11,11 +11,15 @@ let LANGUAGES: [String: String] = [
 let IGNORED_DIRS: Set<String> = [
     "node_modules",
     "dist",
+    ".dist",
+    "out",
     "build",
+    ".build",
     "__pycache__",
     ".git",
     "venv",
     "env",
     ".venv",
     "target",
+    ".target",
 ]

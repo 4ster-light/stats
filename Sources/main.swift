@@ -9,16 +9,16 @@ struct Stats: ParsableCommand {
     func run() throws {
         let directoryURL = URL(fileURLWithPath: directory, isDirectory: true)
 
-        do {
-            let fileAnalyses = try getFiles(directory: directoryURL).compactMap {
-                analyzeFile(filePath: $0)
+        let result = getFiles(directory: directoryURL)
+            .flatMap { files in
+                let analyses = files.compactMap { analyzeFile(filePath: $0) }
+                return .success(analyses)
             }
-            let results = aggregateResults(fileAnalyses: fileAnalyses)
-            displayResults(results: results)
-        } catch let error as StatsError {
-            print("Error: \(error.description)".red)
-        } catch {
-            print("Error: An unexpected error occurred.".red)
+            .map(aggregateResults)
+            .map(displayResults)
+
+        if case .failure(let error) = result {
+            print(error.description.red)
         }
     }
 }

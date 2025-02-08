@@ -2,48 +2,42 @@ import Foundation
 import Rainbow
 
 func aggregateResults(fileAnalyses: [FileAnalysis]) -> AnalysisResults {
-    var languageStats: [String: LanguageStats] = [:]
-    var totalFiles = 0
-    var totalLines = 0
+    let languageStats = Dictionary(grouping: fileAnalyses, by: \.language)
+        .mapValues { analyses in
+            let files = analyses.count
+            let lines = analyses.reduce(0) { $0 + $1.lineCount }
+            return LanguageStats(files: files, lines: lines)
+        }
 
-    for language in LANGUAGES.keys {
-        let analyses = fileAnalyses.filter { $0.language == language }
-        let files = analyses.count
-        let lines = analyses.reduce(0) { $0 + $1.lineCount }
-
-        languageStats[language] = LanguageStats(files: files, lines: lines)
-        totalFiles += files
-        totalLines += lines
-    }
+    let totalFiles = languageStats.values.reduce(0) { $0 + $1.files }
+    let totalLines = languageStats.values.reduce(0) { $0 + $1.lines }
 
     return AnalysisResults(stats: languageStats, totalFiles: totalFiles, totalLines: totalLines)
 }
 
 func analyzeFile(filePath: URL) -> FileAnalysis? {
-    for (language, ext) in LANGUAGES {
-        if filePath.pathExtension == ext {
-            do {
-                let content = try String(contentsOf: filePath, encoding: .utf8)
-                let lineCount = content.components(separatedBy: .newlines).count
-                return FileAnalysis(language: language, lineCount: lineCount)
-            } catch {
-                print(
-                    "Warning: Could not process \(filePath.path): \(error.localizedDescription)"
-                        .yellow)
-            }
-        }
+    guard let ext = LANGUAGES.first(where: { filePath.pathExtension == $0.value })?.key else {
+        return nil
     }
-    return nil
+
+    do {
+        let content = try String(contentsOf: filePath, encoding: .utf8)
+        let lineCount = content.components(separatedBy: .newlines).count
+        return FileAnalysis(language: ext, lineCount: lineCount)
+    } catch {
+        print("Warning: Could not process \(filePath.path): \(error.localizedDescription)".yellow)
+        return nil
+    }
 }
 
-func getFiles(directory: URL) throws -> [URL] {
+func getFiles(directory: URL) -> Result<[URL], StatsError> {
     let fileManager = FileManager.default
     guard fileManager.fileExists(atPath: directory.path) else {
-        throw StatsError.directoryNotFound(directory.path)
+        return .failure(.directoryNotFound(directory.path))
     }
 
     guard fileManager.isReadableFile(atPath: directory.path) else {
-        throw StatsError.directoryNotReadable(directory.path)
+        return .failure(.directoryNotReadable(directory.path))
     }
 
     guard
@@ -52,16 +46,13 @@ func getFiles(directory: URL) throws -> [URL] {
             options: [.skipsHiddenFiles, .skipsPackageDescendants]
         )
     else {
-        throw StatsError.directoryEnumerationFailed(directory.path)
+        return .failure(.directoryEnumerationFailed(directory.path))
     }
 
-    var files: [URL] = []
-    for case let fileURL as URL in enumerator {
-        if !IGNORED_DIRS.contains(fileURL.lastPathComponent) {
-            files.append(fileURL)
-        }
-    }
-    return files
+    let files = enumerator.compactMap { $0 as? URL }
+        .filter { !IGNORED_DIRS.contains($0.lastPathComponent) }
+
+    return .success(files)
 }
 
 func displayResults(results: AnalysisResults) {
@@ -83,21 +74,4 @@ func displayResults(results: AnalysisResults) {
 
     print("└────────────┴───────┴───────┴────────┴────────┘")
     print("\n")
-}
-
-enum StatsError: Error, CustomStringConvertible {
-    case directoryNotFound(String)
-    case directoryNotReadable(String)
-    case directoryEnumerationFailed(String)
-
-    var description: String {
-        switch self {
-        case .directoryNotFound(let path):
-            return "Directory not found: \(path)"
-        case .directoryNotReadable(let path):
-            return "Directory not readable: \(path)"
-        case .directoryEnumerationFailed(let path):
-            return "Failed to enumerate files in directory: \(path)"
-        }
-    }
 }
