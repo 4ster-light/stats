@@ -6,13 +6,11 @@ pub fn languages() -> &'static HashMap<&'static str, &'static str> {
     static LANGUAGES: OnceLock<HashMap<&'static str, &'static str>> = OnceLock::new();
     LANGUAGES.get_or_init(|| {
         let mut map = HashMap::new();
-        map.insert("Python", "py");
         map.insert("Rust", "rs");
         map.insert("Haskell", "hs");
         map.insert("Lua", "lua");
         map.insert("TypeScript", "ts");
         map.insert("JavaScript", "js");
-        map.insert("Swift", "swift");
         map.insert("Go", "go");
         map
     })
