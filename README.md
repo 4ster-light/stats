@@ -1,83 +1,57 @@
-# stats
+# Stats
 
-An small tool I made to know how much I code in each language I use
+A command-line tool written in Rust for analyzing programming language statistics in a directory.
+
+## Features
+
+- Analyzes directories to count files and lines of code by programming language
+- Filters out common directories like `.git`, `node_modules`, etc.
+- Displays results in a colorful, formatted table
+- Supports any configured programming languages
+
+## Default Languages
+
+- Rust (.rs)
+- Go (.go)
+- JavaScript (.js)
+- TypeScript (.ts)
+- Lua (.lua)
+- Haskell (.hs)
+
+## Installation
+
+### From Source
+
+1. Clone the repository
+2. Install the project:
+
+```bash
+cargo install --path .
+```
 
 ## Usage
 
-### Install
-
->[!IMPORTANT]
-> First, you need to install the dependencies
-
 ```bash
-swift package resolve
+# Analyze the current directory
+stats
+
+# Analyze a specific directory
+stats /path/to/directory
 ```
 
-Package.swift:
+## Example Output
 
-```swift
-// swift-tools-version: 6.0
-
-import PackageDescription
-
-let package = Package(
-    name: "stats",
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/onevcat/Rainbow", from: "4.1.0"),
-    ],
-    targets: [
-        .executableTarget(
-            name: "stats",
-            dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "Rainbow", package: "Rainbow"),
-            ]),
-        .testTarget(
-            name: "statsTests",
-            dependencies: ["stats"]),
-    ]
-)
 ```
-
-### Running
-
-The directory must be given as only argument or else it'll default to the current directory.
-If you just want to run it directly:
-
-```bash
-swift run stats <directory>
-```
-If you want a production build:
-
-```bash
-swift build -c release
-.build/release/stats <directory>
-```
-
-In order to run the tests:
-
-```bash
-swift test
-```
-
-## Output
-
-```bash
 Language Statistics
 ┏━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━┳━━━━━━━━┓
 ┃ Language   ┃ Files ┃ Lines ┃ File % ┃ Line % ┃
 ┡━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━╇━━━━━━━━┩
-│ Haskell    │ 5     │ 165   │ 10.9%  │ 9.1%   │
-│ JavaScript │ 3     │ 107   │ 6.5%   │ 5.9%   │
-│ Lua        │ 4     │ 203   │ 8.7%   │ 11.2%  │
-│ Python     │ 3     │ 113   │ 6.5%   │ 6.2%   │
-│ Rust       │ 15    │ 625   │ 32.6%  │ 34.5%  │
-│ Swift      │ 6     │ 266   │ 13.0%  │ 14.7%  │
-│ TypeScript │ 10    │ 330   │ 21.7%  │ 18.2%  │
+│ Rust       │    10 │  1250 │  62.5% │  75.8% │
+│ JavaScript │     4 │   250 │  25.0% │  15.2% │
+│ Python     │     2 │   150 │  12.5% │   9.1% │
 └────────────┴───────┴───────┴────────┴────────┘
 ```
 
 ## License
 
-GNU GPL v3
+GNU General Public License v3.0

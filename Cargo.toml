@@ -1,0 +1,12 @@
+[package]
+name = "stats"
+version = "0.1.0"
+edition = "2024"
+description = "A tool for analyzing programming language statistics in a directory"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+colored = "2.0"
+anyhow = "1.0"
+thiserror = "1.0"
+walkdir = "2.3"
