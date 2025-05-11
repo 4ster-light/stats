@@ -18,7 +18,7 @@ struct Args {
 
 fn main() -> Result<()> {
     let args = Args::parse();
-    
+
     let files = match analysis::get_files(&args.directory) {
         Ok(files) => files,
         Err(err) => {
@@ -26,16 +26,16 @@ fn main() -> Result<()> {
             std::process::exit(1);
         }
     };
-    
+
     let mut file_analyses = Vec::new();
     for file in files {
         if let Ok(Some(analysis)) = analysis::analyze_file(&file) {
             file_analyses.push(analysis);
         }
     }
-    
+
     let results = analysis::aggregate_results(file_analyses);
     analysis::display_results(&results);
-    
+
     Ok(())
 }

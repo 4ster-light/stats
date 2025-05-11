@@ -14,10 +14,10 @@ fn should_skip(entry: &DirEntry) -> bool {
         let file_name = entry.file_name().to_string_lossy();
         let is_hidden = file_name.starts_with('.') && file_name != ".";
         let is_ignored = config::ignored_dirs().contains(file_name.as_ref());
-        
+
         return is_hidden || is_ignored;
     }
-    
+
     false
 }
 
@@ -25,11 +25,15 @@ fn should_skip(entry: &DirEntry) -> bool {
 pub fn get_files(directory: &Path) -> Result<Vec<PathBuf>, StatsError> {
     // Check if directory exists
     if !directory.exists() {
-        return Err(StatsError::DirectoryNotFound(directory.display().to_string()));
+        return Err(StatsError::DirectoryNotFound(
+            directory.display().to_string(),
+        ));
     }
 
     if !directory.is_dir() {
-        return Err(StatsError::DirectoryNotFound(directory.display().to_string()));
+        return Err(StatsError::DirectoryNotFound(
+            directory.display().to_string(),
+        ));
     }
 
     let mut files = Vec::new();
@@ -47,7 +51,7 @@ pub fn get_files(directory: &Path) -> Result<Vec<PathBuf>, StatsError> {
                 // Check if file extension is supported
                 if let Some(ext) = entry.path().extension() {
                     let ext_str = ext.to_string_lossy().to_string();
-                    
+
                     // Check if this extension is in our supported languages
                     for &lang_ext in config::languages().values() {
                         if ext_str == lang_ext {
@@ -58,8 +62,10 @@ pub fn get_files(directory: &Path) -> Result<Vec<PathBuf>, StatsError> {
                 }
             }
             Err(err) => {
-                eprintln!("{}", format!("Warning: Could not access {}: {}", 
-                    directory.display(), err).yellow());
+                eprintln!(
+                    "{}",
+                    format!("Warning: Could not access {}: {}", directory.display(), err).yellow()
+                );
             }
         }
     }
@@ -99,8 +105,15 @@ pub fn analyze_file(file_path: &Path) -> Result<Option<FileAnalysis>, StatsError
             }))
         }
         Err(err) => {
-            eprintln!("{}", format!("Warning: Could not process {}: {}", 
-                file_path.display(), err).yellow());
+            eprintln!(
+                "{}",
+                format!(
+                    "Warning: Could not process {}: {}",
+                    file_path.display(),
+                    err
+                )
+                .yellow()
+            );
             Ok(None)
         }
     }
@@ -110,7 +123,7 @@ pub fn analyze_file(file_path: &Path) -> Result<Option<FileAnalysis>, StatsError
 pub fn aggregate_results(file_analyses: Vec<FileAnalysis>) -> AnalysisResults {
     // Group by language
     let mut lang_stats: HashMap<String, LanguageStats> = HashMap::new();
-    
+
     for analysis in file_analyses {
         let stats = lang_stats.entry(analysis.language).or_default();
         stats.files += 1;
@@ -142,7 +155,8 @@ pub fn display_results(results: &AnalysisResults) {
 
     for lang in languages {
         let stats = &results.stats[lang];
-        let (file_pct, line_pct) = stats.calculate_percentages(results.total_files, results.total_lines);
+        let (file_pct, line_pct) =
+            stats.calculate_percentages(results.total_files, results.total_lines);
 
         // Padding for alignment
         let padded_lang = right_pad(lang, 10);
@@ -151,8 +165,14 @@ pub fn display_results(results: &AnalysisResults) {
         let padded_file_pct = left_pad(&format!("{:.1}%", file_pct), 6);
         let padded_line_pct = left_pad(&format!("{:.1}%", line_pct), 6);
 
-        println!("│ {} │ {} │ {} │ {} │ {} │",
-            padded_lang.yellow().bold(), padded_files, padded_lines, padded_file_pct, padded_line_pct);
+        println!(
+            "│ {} │ {} │ {} │ {} │ {} │",
+            padded_lang.yellow().bold(),
+            padded_files,
+            padded_lines,
+            padded_file_pct,
+            padded_line_pct
+        );
     }
 
     println!("└────────────┴───────┴───────┴────────┴────────┘");
