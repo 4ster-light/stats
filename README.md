@@ -1,24 +1,14 @@
-# Stats
+# 🧮 Stats
 
 A command-line tool written in Rust for analyzing programming language statistics in a directory.
 
-## Features
+## 📜 Features
 
 - Analyzes directories to count files and lines of code by programming language
 - Filters out common directories like `.git`, `node_modules`, etc.
 - Displays results in a colorful, formatted table
-- Supports any configured programming languages
 
-## Default Languages
-
-- Rust (.rs)
-- Go (.go)
-- JavaScript (.js)
-- TypeScript (.ts)
-- Lua (.lua)
-- Haskell (.hs)
-
-## Installation
+## 🛠 Installation
 
 ### From Source
 
@@ -29,7 +19,7 @@ A command-line tool written in Rust for analyzing programming language statistic
 cargo install --path .
 ```
 
-## Usage
+## 🛠 Usage
 
 ```bash
 # Analyze the current directory
@@ -46,12 +36,12 @@ Language Statistics
 ┏━━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┳━━━━━━━━┳━━━━━━━━┓
 ┃ Language   ┃ Files ┃ Lines ┃ File % ┃ Line % ┃
 ┡━━━━━━━━━━━━╇━━━━━━━╇━━━━━━━╇━━━━━━━━╇━━━━━━━━┩
-│ Rust       │    10 │  1250 │  62.5% │  75.8% │
-│ JavaScript │     4 │   250 │  25.0% │  15.2% │
-│ Python     │     2 │   150 │  12.5% │   9.1% │
+│ rs         │    10 │  1250 │  62.5% │  75.8% │
+│ js         │     4 │   250 │  25.0% │  15.2% │
+│ py         │     2 │   150 │  12.5% │   9.1% │
 └────────────┴───────┴───────┴────────┴────────┘
 ```
 
-## License
+## 📄 License
 
 GNU General Public License v3.0
