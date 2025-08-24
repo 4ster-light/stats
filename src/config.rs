@@ -1,23 +1,5 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::sync::OnceLock;
-
-/// Get the mapping of programming languages to their file extensions
-pub fn languages() -> &'static HashMap<&'static str, &'static str> {
-    static LANGUAGES: OnceLock<HashMap<&'static str, &'static str>> = OnceLock::new();
-    LANGUAGES.get_or_init(|| {
-        let mut map = HashMap::new();
-        map.insert("Rust", "rs");
-        map.insert("C#", "cs");
-        map.insert("F#", "fs");
-        map.insert("F#-Script", "fsx");
-        map.insert("Lua", "lua");
-        map.insert("TypeScript", "ts");
-        map.insert("JavaScript", "js");
-        map.insert("Go", "go");
-        map.insert("Swift", "swift");
-        map
-    })
-}
 
 /// Get the set of directory names that should be ignored during analysis
 pub fn ignored_dirs() -> &'static HashSet<&'static str> {

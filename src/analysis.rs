@@ -1,4 +1,5 @@
 use crate::config;
+use crate::utils;
 use crate::models::{AnalysisResults, FileAnalysis, LanguageStats, StatsError};
 use anyhow::Result;
 use colored::Colorize;
@@ -47,19 +48,7 @@ pub fn get_files(directory: &Path) -> Result<Vec<PathBuf>, StatsError> {
                 if entry.file_type().is_dir() {
                     continue;
                 }
-
-                // Check if file extension is supported
-                if let Some(ext) = entry.path().extension() {
-                    let ext_str = ext.to_string_lossy().to_string();
-
-                    // Check if this extension is in our supported languages
-                    for &lang_ext in config::languages().values() {
-                        if ext_str == lang_ext {
-                            files.push(entry.path().to_path_buf());
-                            break;
-                        }
-                    }
-                }
+                files.push(entry.path().to_path_buf());
             }
             Err(err) => {
                 eprintln!(
@@ -81,26 +70,12 @@ pub fn analyze_file(file_path: &Path) -> Result<Option<FileAnalysis>, StatsError
         None => return Ok(None),
     };
 
-    // Find language for this extension
-    let mut language = None;
-    for (&lang, &lang_ext) in config::languages().iter() {
-        if ext == lang_ext {
-            language = Some(lang.to_string());
-            break;
-        }
-    }
-
-    let language = match language {
-        Some(lang) => lang,
-        None => return Ok(None),
-    };
-
     // Read file and count lines
     match fs::read_to_string(file_path) {
         Ok(content) => {
             let line_count = content.lines().count();
             Ok(Some(FileAnalysis {
-                language,
+                language: ext,
                 line_count,
             }))
         }
@@ -159,11 +134,11 @@ pub fn display_results(results: &AnalysisResults) {
             stats.calculate_percentages(results.total_files, results.total_lines);
 
         // Padding for alignment
-        let padded_lang = right_pad(lang, 10);
-        let padded_files = left_pad(&stats.files.to_string(), 5);
-        let padded_lines = left_pad(&stats.lines.to_string(), 5);
-        let padded_file_pct = left_pad(&format!("{:.1}%", file_pct), 6);
-        let padded_line_pct = left_pad(&format!("{:.1}%", line_pct), 6);
+        let padded_lang = utils::right_pad(lang, 10);
+        let padded_files = utils::left_pad(&stats.files.to_string(), 5);
+        let padded_lines = utils::left_pad(&stats.lines.to_string(), 5);
+        let padded_file_pct = utils::left_pad(&format!("{:.1}%", file_pct), 6);
+        let padded_line_pct = utils::left_pad(&format!("{:.1}%", line_pct), 6);
 
         println!(
             "│ {} │ {} │ {} │ {} │ {} │",
@@ -177,21 +152,4 @@ pub fn display_results(results: &AnalysisResults) {
 
     println!("└────────────┴───────┴───────┴────────┴────────┘");
     println!();
-}
-
-// Helper functions for string padding
-fn right_pad(s: &str, length: usize) -> String {
-    if s.len() >= length {
-        s[..length].to_string()
-    } else {
-        format!("{}{}", s, " ".repeat(length - s.len()))
-    }
-}
-
-fn left_pad(s: &str, length: usize) -> String {
-    if s.len() >= length {
-        s[..length].to_string()
-    } else {
-        format!("{}{}", " ".repeat(length - s.len()), s)
-    }
 }

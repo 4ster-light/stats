@@ -1,10 +1,7 @@
-mod analysis;
-mod config;
-mod models;
-
 use anyhow::Result;
 use clap::Parser;
 use colored::Colorize;
+use stats::analysis;
 use std::path::PathBuf;
 
 /// A tool for analyzing programming language statistics in a directory
